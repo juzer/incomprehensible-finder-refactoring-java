@@ -1,53 +1,64 @@
 package algorithm;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class Finder {
-	private final List<Thing> _p;
+	private final List<Person> persons;
 
-	public Finder(List<Thing> p) {
-		_p = p;
+	public Finder(List<Person> p) {
+		persons = p;
 	}
 
-	public F Find(FT ft) {
+	public Optional<F> Find(FT ft) {
 		List<F> tr = new ArrayList<F>();
 
-		for (int i = 0; i < _p.size() - 1; i++) {
-			for (int j = i + 1; j < _p.size(); j++) {
-				F r = new F();
-				if (_p.get(i).birthDate.getTime() < _p.get(j).birthDate.getTime()) {
-					r.P1 = _p.get(i);
-					r.P2 = _p.get(j);
+		for (int i = 0; i < persons.size() - 1; i++) {
+			for (int j = i + 1; j < persons.size(); j++) {
+				Person personOne;
+				Person personTwo;
+				if (persons.get(i).birthDate().getTime() < persons.get(j).birthDate().getTime()) {
+					personOne = persons.get(i);
+					personTwo = persons.get(j);
 				} else {
-					r.P1 = _p.get(j);
-					r.P2 = _p.get(i);
+					personOne = persons.get(j);
+					personTwo = persons.get(i);
 				}
-				r.D = r.P2.birthDate.getTime() - r.P1.birthDate.getTime();
-				tr.add(r);
+				tr.add(new F(personOne, personTwo, personTwo.birthDate().getTime() - personOne.birthDate().getTime()));
 			}
 		}
 
 		if (tr.size() < 1) {
-			return new F();
+			return Optional.empty();
 		}
 
 		F answer = tr.get(0);
+		switch (ft) {
+			case Closest:
+				return tr.stream().filter(result -> result.difference() < answer.difference()).findFirst();
+			case Furthest:
+				if (result.difference() > answer.difference()) {
+					answer = result;
+				}
+				break;
+		}
+
 		for (F result : tr) {
 			switch (ft) {
-				case One :
-					if (result.D < answer.D) {
+				case Closest:
+					if (result.difference() < answer.difference()) {
 						answer = result;
 					}
 					break;
 
-				case Two :
-					if (result.D > answer.D) {
+				case Furthest:
+					if (result.difference() > answer.difference()) {
 						answer = result;
 					}
 					break;
 			}
 		}
 
-		return answer;
+		return Optional.of(answer);
 	}
 }

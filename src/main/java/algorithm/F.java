@@ -1,6 +1,3 @@
 package algorithm;
-public class F {
-	public Thing P1;
-	public Thing P2;
-	public long D;
+public record F(Person personOne, Person personTwo, long difference) {
 }
